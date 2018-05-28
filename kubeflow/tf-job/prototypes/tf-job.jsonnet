@@ -12,6 +12,8 @@
 // @optionalParam num_ps number 0 The number of ps to use
 // @optionalParam num_workers number 0 The number of workers to use
 // @optionalParam num_gpus number 0 The number of GPUs to attach to workers.
+// @optionalParam gluster_ep string glusterfs-cluster The glusterfs endpoint.
+// @optionalParam gluster_path string null The glusterfs volume path.
 
 // TODO(https://github.com/ksonnet/ksonnet/issues/235): ks param set args won't work if the arg starts with "--".
 
