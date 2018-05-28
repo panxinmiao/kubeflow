@@ -3,10 +3,16 @@ local util = import "util.libsonnet";
 
 {
   parts:: {
-    tfJobReplica(replicaType, number, args, image, imagePullSecrets=[], numGpus=0)::
+    tfJobReplica(replicaType, number, args, image, glusterEp, glusterPath, imagePullSecrets=[], numGpus=0)::
       local baseContainer = {
         image: image,
         name: "tensorflow",
+        volumeMounts: [
+          {
+            mountPath: "/mnt/glusterfs",
+            name: "glusterfs",
+          }
+        ]
       };
       local containerArgs = if std.length(args) > 0 then
         {
@@ -20,6 +26,13 @@ local util = import "util.libsonnet";
           },
         },
       } else {};
+	  local volumes = {
+	    name: "glusterfs",
+	    glusterfs: {
+		  endpoints: glusterEp,
+		  path: glusterPath,
+		}
+	  };
       if number > 0 then
         {
           replicas: number,
@@ -29,6 +42,9 @@ local util = import "util.libsonnet";
               containers: [
                 baseContainer + containerArgs + resources,
               ],
+			        volumes: [
+				        volumes,
+			        ],
               restartPolicy: "OnFailure",
             },
           },
@@ -38,8 +54,8 @@ local util = import "util.libsonnet";
 
     tfJobTerminationPolicy(replicaName, replicaIndex):: {
       chief: {
-        replicaName: replicaName,
-        replicaIndex: replicaIndex,
+          replicaName: replicaName,
+          replicaIndex: replicaIndex,
       },
     },
 
