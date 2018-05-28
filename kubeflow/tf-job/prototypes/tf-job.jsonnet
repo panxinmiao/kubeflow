@@ -54,15 +54,19 @@ else
   tfJob.parts.tfJobReplica("WORKER", numWorkers, args, image, glusterEp, glusterPath, imagePullSecrets);
   
 local masterSpec = if numGpus > 0 then
-  tfJob.parts.tfJobReplica("MASTER", numMasters, args, imageGpu, glusterEp, glusterPath, numGpus, imagePullSecrets)
+  tfJob.parts.tfJobReplica("MASTER", numMasters, args, imageGpu, glusterEp, glusterPath, imagePullSecrets, numGpus)
 else
   tfJob.parts.tfJobReplica("MASTER", numMasters, args, image, glusterEp, glusterPath, imagePullSecrets);
 
 std.prune(k.core.v1.list.new([
-  tfJob.parts.tfJob(name, namespace, [
-    masterSpec,
-    workerSpec,
-    tfJob.parts.tfJobReplica("PS", numPs, args, image, glusterEp, glusterPath, imagePullSecrets),],
+  tfJob.parts.tfJob(
+    name, 
+    namespace, 
+    [
+      masterSpec,
+      workerSpec,
+      tfJob.parts.tfJobReplica("PS", numPs, args, image, glusterEp, glusterPath, imagePullSecrets),
+    ],
     terminationPolicy
   ),
 ]))
